@@ -1,5 +1,6 @@
 package com.santam.auth.infra.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,10 +13,13 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity // dizer que  aqui será configurado spring security
 public class SecurityConfiguration {
+    @Autowired
+    SecurityFilter securityFilter;
     // security filter chain -> corrente de filtro de segurança
     // validando se usuario esta apto ou não a fazer requisição
     @Bean
@@ -29,6 +33,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/product").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class) // verificar token antes do spring executar authorizeHttpRequests
                 .build();
     }
 
